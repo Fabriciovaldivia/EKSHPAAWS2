@@ -8,3 +8,10 @@
 # Variables sensibles
 #terraform.tfvars
 #*.auto.tfvars
+
+# Ignorar archivos y carpetas generadas por Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.exe
