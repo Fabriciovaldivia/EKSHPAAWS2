@@ -1,0 +1,14 @@
+# nginx-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-lb
+  labels:
+    app: nginx-demo
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx-demo
+  ports:
+  - port: 80
+    targetPort: 80

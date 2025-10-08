@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-demo
+  template:
+    metadata:
+      labels:
+        app: nginx-demo
+    spec:
+      containers:
+      - name: nginx
+        image: ubuntu:22.04
+        ports:
+        - containerPort: 80
+        command:
+          - /bin/bash
+          - -c
+          - |
+            apt update && \
+            apt install -y nginx iputils-ping stress curl && \
+            echo "Instalación completa" && \
+            cat > /var/www/html/index.html <<EOF
+            <!doctype html>
+            <html>
+              <head><meta charset="utf-8"/><title>NGINX - Pod info</title></head>
+              <body>
+                <h1>If you see this page, nginx is installed.</h1>
+                <ul>
+                  <li><strong>Pod:</strong> ${POD_NAME}</li>
+                  <li><strong>Pod IP:</strong> ${POD_IP}</li>
+                  <li><strong>Node:</strong> ${NODE_NAME}</li>
+                </ul>
+                <p>Refresca varias veces para observar el balanceo.</p>
+              </body>
+            </html>
+            EOF
+            exec nginx -g 'daemon off;'
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20

@@ -1,0 +1,10 @@
+# Terraform state
+#*.tfstate
+#*.tfstate.*
+
+# Carpeta de trabajo local de Terraform
+#.terraform/
+
+# Variables sensibles
+#terraform.tfvars
+#*.auto.tfvars
